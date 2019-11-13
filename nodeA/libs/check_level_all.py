@@ -121,13 +121,13 @@ def get_hash(block):
 
 if __name__ == "__main__":
     pass
-    # P1 = "/Users/yutaka/python/python3.6.5/BC2ODPT/nodeA/db/ldb/"
-    # P2 = "/Users/yutaka/python/python3.6.5/BC2ODPT/nodeB/db/ldb/"
-    #
-    # read_bc = json_db(P1)
-    # print(read_bc)
-    # print(is_valid_chain(read_bc))
-    # print(valid_all(P1))
+    P1 = "/Users/yutaka/python/python3.6.5/BC2ODPT/nodeA/db/ldb/"
+    P2 = "/Users/yutaka/python/python3.6.5/BC2ODPT/nodeB/db/ldb/"
+
+    read_bc = json_db(P1)
+    print(read_bc)
+    print(is_valid_chain(read_bc))
+    print(valid_all(P1))
 
     # with open("memo.json", "w") as f:
     #     f.write(json.dumps(read_bc))
