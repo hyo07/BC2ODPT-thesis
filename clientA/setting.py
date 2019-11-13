@@ -1,0 +1,2 @@
+DEBUG = True
+DIFFICULTY = 4
