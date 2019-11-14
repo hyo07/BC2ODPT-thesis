@@ -1,4 +1,4 @@
-DEBUG = False
+DEBUG = True
 DIFFICULTY = 5
 
 HOST_PORT = 50090

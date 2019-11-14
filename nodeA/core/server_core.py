@@ -107,7 +107,7 @@ class ServerCore(object):
 
             result = self.tp.get_stored_transactions()
             print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
-            print("transactions", result)
+            print("transactions", self.tp.get_stored_transactions())
             print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
 
             if result is None:
