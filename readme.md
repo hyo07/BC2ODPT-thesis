@@ -14,6 +14,11 @@ BCを用いることで複数のコアノードがネットワークを介して
 BC2ODPTはBC(BlockChain)とODPTを組み合わせることで便利な公共交通を実現する第一歩を初めて踏み出した作品です。
 
 
+## アイデアについてのドキュメント
+https://docs.google.com/document/d/1MoxBF5Mhwtya_5IbWbNOSFZIeyDcnu13YGX97S03bW8/edit?usp=sharing
+
+
+
 # 実行可能環境
 - Python 3.6以上
 - 必要モジュール: `requirements.txt` に記載
