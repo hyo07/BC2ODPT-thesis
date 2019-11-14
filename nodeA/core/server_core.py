@@ -106,6 +106,9 @@ class ServerCore(object):
         while self.flag_stop_block_build is not True:
 
             result = self.tp.get_stored_transactions()
+            print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+            print("transactions", result)
+            print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
 
             if result is None:
                 print('Transaction Pool is empty ...')
@@ -123,10 +126,8 @@ class ServerCore(object):
             index = len(result)
             self.tp.clear_my_transactions(index)
             break
-
         print("■■■■■■■■■■■■■■■■■■■ Current BC ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
         print(self.bm.chain)
-        print("■■■■■■■■■■■■■■■■■■■ Current BC ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
 
         if len(self.bm.chain) >= 10:
             main_level.add_db(ldb_p=LDB_P, param_p=PARAM_P, zip_p=ZIP_P, vals=self.bm.chain[:5])

@@ -1,7 +1,6 @@
 import requests
 import json
-
-API_KEY = "6a294592f92c6adf7c749f4934ace3a23dceeecef46d82f65f01b9218cdacc26"
+from setting import *
 
 API_TYPE = "odpt:Train"
 URL = "https://api-tokyochallenge.odpt.org/api/v4/{api_type}?acl:consumerKey={api_key}". \

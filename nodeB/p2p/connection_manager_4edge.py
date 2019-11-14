@@ -71,7 +71,8 @@ class ConnectionManager4Edge(object):
             peer : 接続先のIPアドレスとポート番号を格納するタプル
             msg : 送信したいメッセージ（JSON形式を想定） 
         """
-        print('Sending... ', msg)
+        if DEBUG:
+            print('Sending... ', msg)
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((peer))

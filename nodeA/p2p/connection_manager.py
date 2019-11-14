@@ -30,6 +30,7 @@ from .message_manager import (
 )
 
 from libs import get_level_dir, level_param, check_level_all
+from setting import *
 
 # 動作確認用の値。本来は30分(1800)くらいがいいのでは
 PING_INTERVAL = 10
@@ -90,7 +91,8 @@ class ConnectionManager:
             msgtxt : MessageManagerのbuild_messageによって生成されたJSON形式のメッセージ
         """
         msgtxt = self.mm.build(msg_type, self.port, payload)
-        print('generated_msg:', msgtxt)
+        if DEBUG:
+            print('generated_msg:', msgtxt)
         return msgtxt
 
     # 指定されたノードに対してメッセージを送信する
@@ -98,28 +100,34 @@ class ConnectionManager:
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect(peer)
-            print(peer)
+            if DEBUG:
+                print(peer)
             s.sendall(msg.encode('utf-8'))
             s.close()
         except OSError:
-            print('Connection failed for peer : ', peer)
+            if DEBUG:
+                print('Connection failed for peer : ', peer)
             self.__remove_peer(peer)
 
     # Coreノードリストに登録されている全てのノードに対して同じメッセージをブロードキャストする
     def send_msg_to_all_peer(self, msg):
-        print('send_msg_to_all_peer was called!')
+        if DEBUG:
+            print('send_msg_to_all_peer was called!')
         current_list = self.core_node_set.get_list()
         for peer in current_list:
             if peer != (self.host, self.port):
-                print("message will be sent to ... ", peer)
+                if DEBUG:
+                    print("message will be sent to ... ", peer)
                 self.send_msg(peer, msg)
 
     # Edgeノードリストに登録されている全てのノードに対して同じメッセージをブロードキャストする
     def send_msg_to_all_edge(self, msg):
-        print('send_msg_to_all_edge was called! ')
+        if DEBUG:
+            print('send_msg_to_all_edge was called! ')
         current_list = self.edge_node_set.get_list()
         for edge in current_list:
-            print("message will be sent to ... ", edge)
+            if DEBUG:
+                print("message will be sent to ... ", edge)
             self.send_msg(edge, msg)
 
     # 終了前の処理としてソケットを閉じる
@@ -182,7 +190,8 @@ class ConnectionManager:
             return
 
         result, reason, cmd, peer_port, payload = self.mm.parse(data_sum)
-        print(result, reason, cmd, peer_port, payload)
+        if DEBUG:
+            print(result, reason, cmd, peer_port, payload)
         status = (result, reason)
 
         if status == ('error', ERR_PROTOCOL_UNMATCH):
@@ -387,12 +396,14 @@ class ConnectionManager:
         dead_c_node_set = list(filter(lambda p: not self.__is_alive(p), current_core_list))
         if dead_c_node_set:
             changed = True
-            print('Removing peer', dead_c_node_set)
+            if DEBUG:
+                print('Removing peer', dead_c_node_set)
             current_core_list = current_core_list - set(dead_c_node_set)
             self.core_node_set.overwrite(current_core_list)
 
         current_core_list = self.core_node_set.get_list()
-        print('current core node list:', current_core_list)
+        if DEBUG:
+            print('current core node list:', current_core_list)
         # 変更があった時だけブロードキャストで通知する
         if changed:
             cl = pickle.dumps(current_core_list, 0).decode()

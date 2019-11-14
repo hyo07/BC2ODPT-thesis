@@ -45,8 +45,11 @@ class BlockchainManager:
         return len(self.chain)
 
     def get_transactions_from_orphan_blocks(self, orphan_blocks):
-        # current_index = 1
-        current_index = 0
+        if "genesis_block" in self.chain[0]:
+            current_index = 1
+        else:
+            current_index = 0
+
         new_transactions = []
 
         while current_index < len(orphan_blocks):
@@ -69,7 +72,10 @@ class BlockchainManager:
         """
 
         if len(transaction_pool) != 0:
-            current_index = 1
+            if "genesis_block" in self.chain[0]:
+                current_index = 1
+            else:
+                current_index = 0
 
             while current_index < len(self.chain):
                 block = self.chain[current_index]

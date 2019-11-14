@@ -126,7 +126,6 @@ class ServerCore(object):
 
         print("■■■■■■■■■■■■■■■■■■■ Current BC ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
         print(self.bm.chain)
-        print("■■■■■■■■■■■■■■■■■■■ Current BC ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
 
         if len(self.bm.chain) >= 10:
             main_level.add_db(ldb_p=LDB_P, param_p=PARAM_P, zip_p=ZIP_P, vals=self.bm.chain[:5])
@@ -157,6 +156,9 @@ class ServerCore(object):
             if msg[2] == MSG_NEW_TRANSACTION:
                 # 新規transactionを登録する処理を呼び出す
                 new_transaction = json.loads(msg[4])
+                print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+                print("transactions", self.tp.get_stored_transactions())
+                print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
                 if DEBUG:
                     print("received new_transaction", new_transaction)
                 current_transactions = self.tp.get_stored_transactions()

@@ -131,7 +131,8 @@ if __name__ == "__main__":
 
     # with open("memo.json", "w") as f:
     #     f.write(json.dumps(read_bc))
-    # print("---------------------------------------------")
-    # J1 = json_db(P1)
-    # J2 = json_db(P2)
-    # print(J1 == J2)
+
+    print("---------------------------------------------")
+    J1 = json_db(P1)
+    J2 = json_db(P2)
+    print(J1 == J2)

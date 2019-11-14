@@ -1,6 +1,6 @@
 import signal
-
 from core.server_core import ServerCore
+from setting import *
 
 my_p2p_server = None
 
@@ -17,7 +17,7 @@ def shutdown_server():
 def main():
     signal.signal(signal.SIGINT, signal_handler)
     global my_p2p_server
-    my_p2p_server = ServerCore(50090, '192.168.11.35', 50082)
+    my_p2p_server = ServerCore(HOST_PORT, CONNECT_IP, CONNECT_PORT)
     my_p2p_server.start()
     my_p2p_server.join_network()
 

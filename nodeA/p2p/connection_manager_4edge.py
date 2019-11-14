@@ -16,6 +16,8 @@ from .message_manager import (
     OK_WITHOUT_PAYLOAD,
 )
 
+from setting import *
+
 # 動作確認用の値。本来は30分(1800)くらいがいいのでは
 PING_INTERVAL = 10
 
@@ -71,7 +73,8 @@ class ConnectionManager4Edge(object):
             peer : 接続先のIPアドレスとポート番号を格納するタプル
             msg : 送信したいメッセージ（JSON形式を想定） 
         """
-        print('Sending... ', msg)
+        if DEBUG:
+            print('Sending... ', msg)
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((peer))
