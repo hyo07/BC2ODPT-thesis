@@ -1,7 +1,6 @@
 import socket
 import threading
 import pickle
-import codecs
 from concurrent.futures import ThreadPoolExecutor
 
 from .core_node_list import CoreNodeList
