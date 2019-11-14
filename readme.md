@@ -15,8 +15,8 @@ BC2ODPTはBC(BlockChain)とODPTを組み合わせることで便利な公共交�
 
 
 # 実行可能環境
-- Python 3.6.5
-- 必要モジュール: `requirements.txt` に記載（予定）
+- Python 3.6以上
+- 必要モジュール: `requirements.txt` に記載
 
 
 
@@ -24,6 +24,14 @@ BC2ODPTはBC(BlockChain)とODPTを組み合わせることで便利な公共交�
 ## 各ディレクトリ説明
 中身コアノードとしての役割をnodeA、参加コアノードとしてnodeB、APIデータを取得し送信する役割としてclientAという３つのnodeをディレクトリごとに設定しています。  
 ノードを増やしたい場合、ディレクトリごとコピーし、各node*/server2.py・client*/client_*.pyにて、接続先IP・PORTの設定をすることでノードを増やすことが可能です。
+
+## 各種nodeの動き
+### nodeA/server1
+中心コアノードとしての役割。
+### clientA/client_...py
+serverに対してデータを送信
+### nodeB/server2
+新規参加nodeとしての役割。
 
 ## 簡単な実行
 `nodeA/server1.py`を実行することで、中身コアノードが立ち上がります。このとき、`ServerCore({PORT})`内にて起動ホストPORTを設定します。  
@@ -36,3 +44,12 @@ BC2ODPTはBC(BlockChain)とODPTを組み合わせることで便利な公共交�
   
 新規接続のサーバーnodeとしてnodeBを起動する場合、`nodeB/server2.py`を実行します。こちらの接続設定も、clientと同様に、`ServerCore({ホストport}, '{接続先IP}', {接続先PORT})`と設定を行います。  
 その後、`DB2Memory Valid Check OK !!!!`というメッセージが出力されば、ブロックチェーンの同期が完了します。もしnodeBディレクトリ内の`db/ldb/`に共有されたはずのデータが無い場合、nodeBを再起動することで正常に動き直す場合があります。  
+
+## パラメータ設定
+各nodeA, nodeB, clientA ディレクトリ内の`setting.py`にて各種設定が可能。
+- DEBUG: True時、printによる処理を実行する
+- DIFFICULTY: ブロックの生成難易度（高いほど生成に時間がかかる4~6が適正か）
+- API_KEY: テスト用のものを用意しているが、原則変えるのを推奨
+- HOST_PORT: 起動PORT
+- CONNECT_IP: 接続先IP
+- CONNECT_PORT: 接続先PORT
