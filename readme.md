@@ -24,7 +24,7 @@ https://docs.google.com/document/d/1MoxBF5Mhwtya_5IbWbNOSFZIeyDcnu13YGX97S03bW8/
 - 必要モジュール: `requirements.txt` に記載
 
 # 事前準備
-- 各nodeに、node*/db, node*/db/ldb, node*/db/zip というディレクトリを作成する。
+もし各nodeにdbというディレクトリが存在しない場合、node*/db, node*/db/ldb, node*/db/zip というディレクトリを作成する。
 
 
 # 実行方法
