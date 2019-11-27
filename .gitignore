@@ -7,3 +7,6 @@ trash
 .venv/
 *.ldb
 *.zip
+!db
+!db/ldb
+!db/zip
