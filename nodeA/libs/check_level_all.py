@@ -33,7 +33,7 @@ def json_db(p):
         for k, v in db:
             # key = k.decode()
             val = json.loads(v.decode())
-            print(val)
+            # print(val)
             re_s.append(val)
         db.close()
     # print(re_s)
@@ -51,6 +51,7 @@ def valid_all(ldb_p):
             val = json.loads(v.decode())
             re_s.append(val)
         if not is_valid_chain(re_s):
+            print(re_s)
             print("整合性が取れませんでした！！！！")
             return None
         re_s = re_s[-1:]
@@ -116,7 +117,7 @@ def _get_double_sha256(message):
 def get_hash(block):
     block_string = json.dumps(block, sort_keys=True)
     # print("BlockchainManager: block_string", block_string)
-    return binascii.hexlify(_get_double_sha256((block_string).encode('utf-8'))).decode('ascii')
+    return binascii.hexlify(_get_double_sha256(block_string.encode('utf-8'))).decode('ascii')
 
 
 if __name__ == "__main__":

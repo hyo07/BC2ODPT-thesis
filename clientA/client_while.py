@@ -37,9 +37,9 @@ def main():
         }
         my_p2p_client.send_message_to_my_core_node(MSG_NEW_TRANSACTION, json.dumps(transaction))
         count += 1
-        sleep(1)
-        if count % 10 == 0:
-            sleep(10)
+        sleep(5)
+        # if count % 10 == 0:
+        #     sleep(10)
 
 
 if __name__ == '__main__':

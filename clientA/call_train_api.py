@@ -28,8 +28,6 @@ def call_api():
                     "delay": re.get("odpt:delay"),
                 }
             )
-        else:
-            pass
 
     return json.dumps(buses)
 

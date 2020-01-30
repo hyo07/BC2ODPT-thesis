@@ -31,6 +31,7 @@ from .message_manager import (
 
 from libs import get_level_dir, level_param, check_level_all
 from setting import *
+from time import sleep
 
 # 動作確認用の値。本来は30分(1800)くらいがいいのでは
 PING_INTERVAL = 10
@@ -66,7 +67,6 @@ class ConnectionManager:
     def start(self):
         t = threading.Thread(target=self.__wait_for_access)
         t.start()
-
         self.ping_timer_p = threading.Timer(PING_INTERVAL, self.__check_peers_connection)
         self.ping_timer_p.start()
 
@@ -272,10 +272,12 @@ class ConnectionManager:
                             self.flag = 1
 
                         if "genesis_block" in self.sc_self.bm.chain[0]:
-                            msg = self.mm.build(SHARE_DB5, self.port, str(latest_dir))
+                            msg = self.mm.build(SHARE_DB3, self.port, str(latest_dir))
+                            sleep(1)
                             self.send_msg((addr[0], peer_port), msg)
                         elif not check_level_all.is_valid_chain([latest_db_bc[0], self.sc_self.bm.chain[0]]):
-                            msg = self.mm.build(SHARE_DB5, self.port, str(latest_dir))
+                            msg = self.mm.build(SHARE_DB3, self.port, str(latest_dir))
+                            sleep(1)
                             self.send_msg((addr[0], peer_port), msg)
                         else:
                             if check_level_all.is_valid_chain([latest_db_bc[0], self.sc_self.bm.chain[0]]):

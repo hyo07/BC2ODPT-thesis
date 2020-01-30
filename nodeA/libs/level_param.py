@@ -43,4 +43,4 @@ if __name__ == "__main__":
     #     print(k.decode())
     #     print(v.decode())
 
-    print(latest_block_num("../db/2/ldb/"))
+    print(get_block_num("/Users/yutaka/python/python3.6.5/BC2ODPT/nodeA/db/"))

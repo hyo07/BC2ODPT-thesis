@@ -6,6 +6,9 @@ import threading
 
 from setting import *
 
+from p2p.connection_manager import LDB_P, PARAM_P, ZIP_P
+from libs import main_level, level_param
+
 
 class BlockchainManager:
 
@@ -28,6 +31,14 @@ class BlockchainManager:
         with self.lock:
             if self.is_valid_chain(blockchain):
                 self.chain = blockchain
+
+                if len(self.chain) >= 50:
+                    main_level.add_db(ldb_p=LDB_P, param_p=PARAM_P, zip_p=ZIP_P, vals=self.chain[:25])
+                    self.chain = self.chain[25:]
+                    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+                    print("保存しました")
+                    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+
                 latest_block = self.chain[-1]
                 return self.get_hash(latest_block)
             else:
@@ -45,10 +56,10 @@ class BlockchainManager:
         return len(self.chain)
 
     def get_transactions_from_orphan_blocks(self, orphan_blocks):
-        if "genesis_block" in self.chain[0]:
-            current_index = 1
-        else:
-            current_index = 0
+        # if "genesis_block" in self.chain[0]:
+        #     current_index = 1
+        # else:
+        current_index = 0
 
         new_transactions = []
 
@@ -99,12 +110,15 @@ class BlockchainManager:
         mychain_len = len(self.chain)
         new_chain_len = len(chain)
 
-        pool_4_orphan_blocks = copy.deepcopy(self.chain)
+        mychain_num = int(self.chain[-1]["block_number"])
+        new_chain_num = int(chain[-1]["block_number"])
+
         has_orphan = False
 
         # 自分のチェーンの中でだけ処理済みとなっているTransactionを救出する。現在のチェーンに含まれていない
         # ブロックを全て取り出す。時系列を考えての有効無効判定などはしないかなり簡易な処理。
-        if new_chain_len > mychain_len:
+        if (new_chain_len > mychain_len) and (new_chain_num > mychain_num):
+            pool_4_orphan_blocks = copy.deepcopy(self.chain)
             for b in pool_4_orphan_blocks:
                 for b2 in chain:
                     if b == b2:

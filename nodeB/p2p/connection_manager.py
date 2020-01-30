@@ -30,6 +30,8 @@ from .message_manager import (
 )
 
 from libs import get_level_dir, level_param, check_level_all
+from setting import *
+from time import sleep
 
 # 動作確認用の値。本来は30分(1800)くらいがいいのでは
 PING_INTERVAL = 10
@@ -65,7 +67,6 @@ class ConnectionManager:
     def start(self):
         t = threading.Thread(target=self.__wait_for_access)
         t.start()
-
         self.ping_timer_p = threading.Timer(PING_INTERVAL, self.__check_peers_connection)
         self.ping_timer_p.start()
 
@@ -263,10 +264,12 @@ class ConnectionManager:
                             self.flag = 1
 
                         if "genesis_block" in self.sc_self.bm.chain[0]:
-                            msg = self.mm.build(SHARE_DB5, self.port, str(latest_dir))
+                            msg = self.mm.build(SHARE_DB3, self.port, str(latest_dir))
+                            sleep(1)
                             self.send_msg((addr[0], peer_port), msg)
                         elif not check_level_all.is_valid_chain([latest_db_bc[0], self.sc_self.bm.chain[0]]):
-                            msg = self.mm.build(SHARE_DB5, self.port, str(latest_dir))
+                            msg = self.mm.build(SHARE_DB3, self.port, str(latest_dir))
+                            sleep(1)
                             self.send_msg((addr[0], peer_port), msg)
                         else:
                             if check_level_all.is_valid_chain([latest_db_bc[0], self.sc_self.bm.chain[0]]):
@@ -387,12 +390,14 @@ class ConnectionManager:
         dead_c_node_set = list(filter(lambda p: not self.__is_alive(p), current_core_list))
         if dead_c_node_set:
             changed = True
-            print('Removing peer', dead_c_node_set)
+            if DEBUG:
+                print('Removing peer', dead_c_node_set)
             current_core_list = current_core_list - set(dead_c_node_set)
             self.core_node_set.overwrite(current_core_list)
 
         current_core_list = self.core_node_set.get_list()
-        print('current core node list:', current_core_list)
+        if DEBUG:
+            print('current core node list:', current_core_list)
         # 変更があった時だけブロードキャストで通知する
         if changed:
             cl = pickle.dumps(current_core_list, 0).decode()

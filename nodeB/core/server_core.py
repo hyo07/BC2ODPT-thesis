@@ -3,7 +3,7 @@ import threading
 import json
 import pickle
 
-from libs import main_level
+from libs import main_level, level_param
 
 from blockchain.blockchain_manager import BlockchainManager
 from blockchain.block_builder import BlockBuilder
@@ -20,6 +20,7 @@ from p2p.message_manager import (
 )
 
 from p2p.connection_manager import LDB_P, PARAM_P, ZIP_P
+from time import sleep
 
 STATE_INIT = 0
 STATE_STANDBY = 1
@@ -93,46 +94,68 @@ class ServerCore(object):
         self.cm.send_msg((self.core_node_host, self.core_node_port), new_message)
         print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
 
-    # TODO 接続時のアレコレ
     def get_all_chains_for_resolve_conflict(self):
         print('get_all_chains_for_resolve_conflict called')
         new_message = self.cm.get_message_text(MSG_REQUEST_FULL_CHAIN)
         self.cm.send_msg_to_all_peer(new_message)
 
     def __generate_block_with_tp(self):
-
         if DEBUG:
             print('Thread for generate_block_with_tp started!')
-        while self.flag_stop_block_build is not True:
-
+        # while self.flag_stop_block_build is not True:
+        if self.flag_stop_block_build is not True:
             result = self.tp.get_stored_transactions()
+            print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+            print("transactions", self.tp.get_stored_transactions())
+            print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
 
-            if result is None:
-                print('Transaction Pool is empty ...')
-                break
+            # if not result:
+            #     print('Transaction Pool is empty ...')
+            #     new_block = self.bb.generate_new_block("", self.prev_block_hash)
+            #     self.bm.set_new_block(new_block.to_dict())
+            #     self.prev_block_hash = self.bm.get_hash(new_block.to_dict())
+            #     # message_new_block = self.cm.get_message_text(MSG_NEW_BLOCK,
+            #     #                                              json.dumps(new_block.to_dict(), sort_keys=True,
+            #     #                                                         ensure_ascii=False))
+            #     message_new_block = self.cm.get_message_text(MSG_NEW_BLOCK, json.dumps(new_block.to_dict()))
+            #     self.cm.send_msg_to_all_peer(message_new_block)
+            #     index = len(result)
+            #     self.tp.clear_my_transactions(index)
 
             new_tp = self.bm.remove_useless_transaction(result)
             self.tp.renew_my_transactions(new_tp)
             # if len(new_tp) == 0:  # TODO TPが0のとき、終わるように。コメントアウトで切り替え
             #     break
-            new_block = self.bb.generate_new_block(new_tp, self.prev_block_hash)
+            block_num = level_param.get_block_num(PARAM_P) + len(self.bm.chain)
+            new_block = self.bb.generate_new_block(new_tp, self.prev_block_hash, str(block_num))
             self.bm.set_new_block(new_block.to_dict())
             self.prev_block_hash = self.bm.get_hash(new_block.to_dict())
+
+            if len(self.bm.chain) >= 30:
+                main_level.add_db(ldb_p=LDB_P, param_p=PARAM_P, zip_p=ZIP_P, vals=self.bm.chain[:15])
+                self.bm.chain = self.bm.chain[15:]
+                print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+                print("保存しました")
+                print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+
             message_new_block = self.cm.get_message_text(MSG_NEW_BLOCK, json.dumps(new_block.to_dict()))
+
             self.cm.send_msg_to_all_peer(message_new_block)
+
             index = len(result)
             self.tp.clear_my_transactions(index)
-            break
+
+            # break
 
         print("■■■■■■■■■■■■■■■■■■■ Current BC ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
         print(self.bm.chain)
 
-        if len(self.bm.chain) >= 10:
-            main_level.add_db(ldb_p=LDB_P, param_p=PARAM_P, zip_p=ZIP_P, vals=self.bm.chain[:5])
-            self.bm.chain = self.bm.chain[5:]
-            print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
-            print("保存しました")
-            print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+        # if len(self.bm.chain) >= 30:
+        #     main_level.add_db(ldb_p=LDB_P, param_p=PARAM_P, zip_p=ZIP_P, vals=self.bm.chain[:15])
+        #     self.bm.chain = self.bm.chain[15:]
+        #     print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+        #     print("保存しました")
+        #     print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
 
         # print('Current prev_block_hash is ... ', self.prev_block_hash)
         self.flag_stop_block_build = False
@@ -156,9 +179,6 @@ class ServerCore(object):
             if msg[2] == MSG_NEW_TRANSACTION:
                 # 新規transactionを登録する処理を呼び出す
                 new_transaction = json.loads(msg[4])
-                print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
-                print("transactions", self.tp.get_stored_transactions())
-                print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
                 if DEBUG:
                     print("received new_transaction", new_transaction)
                 current_transactions = self.tp.get_stored_transactions()
@@ -205,20 +225,32 @@ class ServerCore(object):
                 # ブロックチェーン送信要求に応じて返却されたブロックチェーンを検証し、有効なものか検証した上で
                 # 自分の持つチェインと比較し優位な方を今後のブロックチェーンとして有効化する
                 new_block_chain = pickle.loads(msg[4].encode('utf8'))
-                print(new_block_chain)
-                result, pool_4_orphan_blocks = self.bm.resolve_conflicts(new_block_chain)
                 if DEBUG:
-                    print('blockchain received')
-                if result is not None:
-                    self.prev_block_hash = result
-                    if len(pool_4_orphan_blocks) != 0:
-                        # orphanブロック群の中にあった未処理扱いになるTransactionをTransactionPoolに戻す
-                        new_transactions = self.bm.get_transactions_from_orphan_blocks(pool_4_orphan_blocks)
-                        for t in new_transactions:
-                            self.tp.set_new_transaction(t)
-                else:
+                    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+                    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+                    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+                    print("受け取った新しいブロックチェーン ", new_block_chain)
+                    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+                    print("型:", type(new_block_chain))
+                    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+                    print("最新ブロック番号:", new_block_chain[-1]["block_number"])
+                    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+                    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+                    print("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")
+                if int(new_block_chain[-1]["block_number"]) > int(self.bm.chain[-1]["block_number"]):
+                    result, pool_4_orphan_blocks = self.bm.resolve_conflicts(new_block_chain)
                     if DEBUG:
-                        print('Received blockchain is useless...')
+                        print('blockchain received')
+                    if result is not None:
+                        self.prev_block_hash = result
+                        # if len(pool_4_orphan_blocks) != 0:
+                        #     # orphanブロック群の中にあった未処理扱いになるTransactionをTransactionPoolに戻す
+                        #     new_transactions = self.bm.get_transactions_from_orphan_blocks(pool_4_orphan_blocks)
+                        #     for t in new_transactions:
+                        #         self.tp.set_new_transaction(t)
+                    else:
+                        if DEBUG:
+                            print('Received blockchain is useless...')
             elif msg[2] == MSG_ENHANCED:
                 # P2P Network を単なるトランスポートして使っているアプリケーションが独自拡張したメッセージはここで処理する。SimpleBitcoin としてはこの種別は使わない
                 self.mpmh.handle_message(msg[4])
